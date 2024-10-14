@@ -180,3 +180,27 @@ As of version 1.6.0, AFT collects anonymous operational metrics to help AWS impr
 | <a name="output_tf_backend_secondary_region"></a> [tf\_backend\_secondary\_region](#output\_tf\_backend\_secondary\_region) | n/a |
 | <a name="output_vcs_provider"></a> [vcs\_provider](#output\_vcs\_provider) | n/a |
 <!-- END_TF_DOCS -->
+
+
+## Error AFT installation fails in eu-south-1 (Milan) region #501 
+
+AFT Version:
+(Can be found in the AFT Management Account in the SSM Parameter /aft/config/aft/version)
+
+Terraform Version & Provider Versions
+Please provide the outputs of terraform version and terraform providers from within your AFT environment
+
+terraform version
+
+1.13.1
+
+terraform providers
+
+1.9.0
+
+Bug Description
+We have a Control Tower installation in eu-south-1 region and we're trying to deploy AFT in the same region. During the terraform plan execution we're getting the following error:
+
+│ Error: reading SSM Parameters by path (/aws/service/global-infrastructure/services/servicecatalog/regions): operation error SSM: GetParametersByPath, https response error StatusCode: 400, RequestID: a951c28c-e2cc-485f-8df7-15f37a44a770, api error AccessDeniedException: No access to "/aws/" namespace: aws/service/global-infrastructure is not a valid namespace │  │   with module.aft.data.aws_ssm_parameters_by_path.servicecatalog_regional_data[0], │   on .terraform/modules/aft/data.tf line 12, in data "aws_ssm_parameters_by_path" "servicecatalog_regional_data": │   12: data "aws_ssm_parameters_by_path" "servicecatalog_regional_data" {
+
+This data lookup can't be executed in Milan region since the global public parameters are not available in that region. However, there is no limitation in that region as per official Control Tower documentation (https://docs.aws.amazon.com/controltower/latest/userguide/limits.html). The expectation is to be able to install AFT also in Milan region as already done for version < 1.12.1.
